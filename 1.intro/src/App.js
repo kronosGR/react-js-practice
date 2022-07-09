@@ -1,4 +1,5 @@
-import logo from "./logo.svg";
+import React, { useState } from "react";
+
 import "./App.css";
 
 const stories = [
@@ -20,18 +21,21 @@ const stories = [
   },
 ];
 
-const welcome = {
-  greeting: "Hey",
-  title: "React",
-};
+
 function App() {
+  const [searchItem, setSearchItem] = useState("");
+  const handleChange = (event) => {
+    setSearchItem(event.target.value);
+  };
   return (
     <div>
       <h1>
-        Hello {welcome.greeting} {welcome.title}
+          <h1>My hacker Stories</h1>
       </h1>
       <label htmlFor="search">Search: </label>
-      <input id="search" type="text" />
+      <input id="search" type="text" onChange={handleChange}/>
+
+        <p>Searching for <strong>{searchItem}</strong></p>
 
       <hr />
       <List list={stories} />
