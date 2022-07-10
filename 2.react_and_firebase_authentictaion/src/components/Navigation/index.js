@@ -1,9 +1,26 @@
 import React from "react";
 
-const App = () => (
+import * as ROUTES from "../../constants/routes";
+const Navigation = () => (
   <div>
-    <h1>App</h1>
+    <ul>
+      <li>
+        <link to={ROUTES.SIGN_IN}>Sign In</link>
+      </li>
+      <li>
+        <link to={ROUTES.LANDING}>Landing</link>
+      </li>
+      <li>
+        <link to={ROUTES.HOME}>Home</link>
+      </li>
+      <li>
+        <link to={ROUTES.ACCOUNT}>Account</link>
+      </li>
+      <li>
+        <link to={ROUTES.ADMIN}>Admin</link>
+      </li>
+    </ul>
   </div>
 );
 
-export default App;
+export default Navigation;

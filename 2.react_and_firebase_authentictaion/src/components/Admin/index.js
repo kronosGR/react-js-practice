@@ -1,9 +1,9 @@
 import React from "react";
 
-const App = () => (
+const AdminPage = () => (
   <div>
-    <h1>App</h1>
+    <h1>AdminPage</h1>
   </div>
 );
 
-export default App;
+export default AdminPage;
