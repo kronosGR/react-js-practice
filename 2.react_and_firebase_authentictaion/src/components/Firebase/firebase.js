@@ -1,5 +1,4 @@
-import firebase from "firebase/compat";
-import app from "firebase.app";
+import app from "firebase/compat/app";
 
 const devConfig = {
   apiKey: process.env.REACT_APP_API_KEY,
