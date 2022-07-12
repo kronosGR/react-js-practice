@@ -20,13 +20,13 @@ export default function App() {
         <hr />
       </div>
       <Routes>
-        <Route path={ROUTES.LANDING} element={LandingPage} />
-        <Route path={ROUTES.SIGN_UP} element={SignUpPage} />
-        <Route path={ROUTES.SIGN_IN} element={SignInPage} />
-        <Route path={ROUTES.PASSWORD_FORGET} element={PasswordForgetPage} />
-        <Route path={ROUTES.HOME} element={HomePage} />
-        <Route path={ROUTES.ACCOUNT} element={AccountPage} />
-        <Route path={ROUTES.ADMIN} element={AdminPage} />
+        <Route path={ROUTES.LANDING} element={<LandingPage />} />
+        <Route path={ROUTES.SIGN_UP} element={<SignUpPage />} />
+        <Route path={ROUTES.SIGN_IN} element={<SignInPage />} />
+        <Route path={ROUTES.PASSWORD_FORGET} element={<PasswordForgetPage />} />
+        <Route path={ROUTES.HOME} element={<HomePage />} />
+        <Route path={ROUTES.ACCOUNT} element={<AccountPage />} />
+        <Route path={ROUTES.ADMIN} element={<AdminPage />} />
       </Routes>
     </BrowserRouter>
   );
