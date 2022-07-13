@@ -2,14 +2,12 @@ import React, { Component, useState } from "react";
 
 import * as ROUTES from "../../constants/routes";
 import { Link } from "react-router-dom";
-import firebase, { FirebaseContext } from "../Firebase";
+import { withFirebase } from "../Firebase";
 
 const SignUpPage = () => (
   <div>
     <h1>SignUp</h1>
-    <FirebaseContext.Consumer>
-      {(firebase) => <SignUpForm firebase={firebase} />}
-    </FirebaseContext.Consumer>
+    <SignUpForm />
   </div>
 );
 
@@ -21,14 +19,17 @@ const INITIAL_STATE = {
   error: null,
 };
 
-const SignUpForm = (props) => {
+const SignUpFormBase = (props) => {
   const [state, setState] = useState(INITIAL_STATE);
   const onSubmit = (event) => {
     const { username, email, passwordOne } = state;
 
     props.firebase
       .doCreateUserWithEmailAndPassword(email, passwordOne)
-      .then((authUser) => setState({ ...INITIAL_STATE }))
+      .then((authUser) => {
+        setState({ ...INITIAL_STATE });
+        props.history.push(ROUTES.HOME);
+      })
       .catch((error) => setState(error));
 
     event.preventDefault();
@@ -89,6 +90,8 @@ const SignUpLink = () => (
     Don't have an account? <Link to={ROUTES.SIGN_UP}>Sign Up</Link>
   </p>
 );
+
+const SignUpForm = withFirebase(SignUpFormBase);
 
 export default SignUpPage;
 
