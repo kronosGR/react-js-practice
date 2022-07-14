@@ -2,11 +2,12 @@ import React, { useState } from "react";
 import { SignUpLink } from "../SignUp";
 
 import * as ROUTES from "../../constants/routes";
+import { withFirebase } from "../Firebase";
 
 const SignInPage = () => (
   <div>
     <h1>SignIn</h1>
-    <SignIForm />
+    <SignInForm />
     <SignUpLink />
   </div>
 );
@@ -19,7 +20,7 @@ const INITIAL_STATE = {
 
 const SignInFormBase = (props) => {
   const [state, setState] = useState(INITIAL_STATE);
-  const { email, password } = state;
+  const { email, password, error } = state;
   const isInvalid = password === "" || email === "";
 
   const onSubmit = (event) => {
