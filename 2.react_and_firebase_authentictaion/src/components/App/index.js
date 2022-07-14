@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Navigation from "../Navigation";
 import LandingPage from "../Landing";
@@ -11,11 +11,19 @@ import AdminPage from "../Admin";
 
 import * as ROUTES from "../../constants/routes";
 
-export default function App() {
+export default function App(props) {
+  const [state, setState] = useState({ authUser: null });
+
+  useEffect(() => {
+    props.firebase.auth.onAuthStateChanged((authUser) => {
+      authUser ? setState({ authUser }) : setState({ authUser: null });
+    });
+  }, []);
+
   return (
     <BrowserRouter>
       <div>
-        <Navigation />
+        <Navigation authUser={state.authUser} />
 
         <hr />
       </div>
