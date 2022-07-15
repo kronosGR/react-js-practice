@@ -10,6 +10,7 @@ import AccountPage from "../Account";
 import AdminPage from "../Admin";
 
 import * as ROUTES from "../../constants/routes";
+import { AuthUserContext } from "../Session";
 
 export default function App(props) {
   const [state, setState] = useState({ authUser: null });
@@ -21,21 +22,26 @@ export default function App(props) {
   }, []);
 
   return (
-    <BrowserRouter>
-      <div>
-        <Navigation authUser={state.authUser} />
+    <AuthUserContext.Provider value={state.authUser}>
+      <BrowserRouter>
+        <div>
+          <Navigation authUser={state.authUser} />
 
-        <hr />
-      </div>
-      <Routes>
-        <Route path={ROUTES.LANDING} element={<LandingPage />} />
-        <Route path={ROUTES.SIGN_UP} element={<SignUpPage />} />
-        <Route path={ROUTES.SIGN_IN} element={<SignInPage />} />
-        <Route path={ROUTES.PASSWORD_FORGET} element={<PasswordForgetPage />} />
-        <Route path={ROUTES.HOME} element={<HomePage />} />
-        <Route path={ROUTES.ACCOUNT} element={<AccountPage />} />
-        <Route path={ROUTES.ADMIN} element={<AdminPage />} />
-      </Routes>
-    </BrowserRouter>
+          <hr />
+        </div>
+        <Routes>
+          <Route path={ROUTES.LANDING} element={<LandingPage />} />
+          <Route path={ROUTES.SIGN_UP} element={<SignUpPage />} />
+          <Route path={ROUTES.SIGN_IN} element={<SignInPage />} />
+          <Route
+            path={ROUTES.PASSWORD_FORGET}
+            element={<PasswordForgetPage />}
+          />
+          <Route path={ROUTES.HOME} element={<HomePage />} />
+          <Route path={ROUTES.ACCOUNT} element={<AccountPage />} />
+          <Route path={ROUTES.ADMIN} element={<AdminPage />} />
+        </Routes>
+      </BrowserRouter>
+    </AuthUserContext.Provider>
   );
 }
