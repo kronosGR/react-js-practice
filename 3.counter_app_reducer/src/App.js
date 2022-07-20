@@ -1,6 +1,22 @@
-import logo from "./logo.svg";
-import "./App.css";
-import { createContext, useContext, useReducer } from "react";
+import React, {
+  createContext,
+  useContext,
+  useReducer,
+  useRef,
+  useEffect,
+} from "react";
+
+const useFlasher = () => {
+  const ref = useRef(null);
+  useEffect(() => {
+    ref.current.classList.add("flash");
+    setTimeout(() => {
+      ref.current.classList.remove("flash");
+    }, 300);
+  });
+  return ref;
+};
+
 const initialState = {
   count1: 0,
   count2: 0,
@@ -23,15 +39,13 @@ const reducer = (state, action) => {
   }
 };
 
-const useValue = () => {
-  return useReducer(reducer, initialState);
-};
+const useValue = () => useReducer(reducer, initialState);
 
 const Context = createContext(null);
 
 const useGlobalState = () => {
   const value = useContext(Context);
-  if (value === null) throw new Error("Please add GlobalSTateProvider");
+  if (value === null) throw new Error("Please add GlobalStateProvider");
   return value;
 };
 
@@ -42,26 +56,23 @@ const GlobalStateProvider = ({ children }) => (
 const Counter = ({ name }) => {
   const [state, dispatch] = useGlobalState();
   return (
-    <div>
+    <div ref={useFlasher()}>
       {state[name]}
-      <button onClick={() => dispatch({ type: "INCREMENT" }, name)}>+1</button>
-      <button onClick={() => dispatch({ type: "DECREMENT" }, name)}>-1</button>
+      <button onClick={() => dispatch({ type: "INCREMENT", name })}>+1</button>
+      <button onClick={() => dispatch({ type: "DECREMENT", name })}>-1</button>
     </div>
   );
 };
 
-function App() {
-  return (
-    <GlobalStateProvider>
-      <h1>Count1</h1>
-      <Counter name="count1" />
-      <Counter name="count1" />
-
-      <h1>Count2</h1>
-      <Counter name="count2" />
-      <Counter name="count2" />
-    </GlobalStateProvider>
-  );
-}
+const App = () => (
+  <GlobalStateProvider>
+    <h1>Count1</h1>
+    <Counter name="count1" />
+    <Counter name="count1" />
+    <h1>Count2</h1>
+    <Counter name="count2" />
+    <Counter name="count2" />
+  </GlobalStateProvider>
+);
 
 export default App;
