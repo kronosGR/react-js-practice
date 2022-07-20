@@ -1,9 +1,28 @@
-import logo from './logo.svg';
-import './App.css';
-const initialState={
-  count1:0,
-  count2:0
-}
+import logo from "./logo.svg";
+import "./App.css";
+import {useReducer} from "react";
+const initialState = {
+  count1: 0,
+  count2: 0,
+};
+
+const reducer = (state, action) => {
+  switch (action.type) {
+    case "INCREMENT":
+      return {
+        ...state,
+        [action.name]: state[action.name] + 1,
+      };
+    case "DECREMENT":
+      return{
+        ...state,
+        [action.name]:state[action.name]-1;
+      }
+    default: return state;
+  }
+};
+
+const useValue=()=> useReducer(reducer, initialState);
 
 
 function App() {
