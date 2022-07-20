@@ -1,6 +1,6 @@
 import logo from "./logo.svg";
 import "./App.css";
-import {useReducer} from "react";
+import { createContext, useContext, useReducer } from "react";
 const initialState = {
   count1: 0,
   count2: 0,
@@ -14,16 +14,30 @@ const reducer = (state, action) => {
         [action.name]: state[action.name] + 1,
       };
     case "DECREMENT":
-      return{
+      return {
         ...state,
-        [action.name]:state[action.name]-1;
-      }
-    default: return state;
+        [action.name]: state[action.name] - 1,
+      };
+    default:
+      return state;
   }
 };
 
-const useValue=()=> useReducer(reducer, initialState);
+const useValue = () => {
+  return useReducer(reducer, initialState);
+};
 
+const Context = createContext(null);
+
+const useGlobalState = () => {
+  const value = useContext(Context);
+  if (value === null) throw new Error("Please add GlobalSTateProvider");
+  return value;
+};
+
+const GlobalStateProvider = ({children}) => (
+  <Context.Provider value={useValue()}>{children}</Context.Provider>
+)
 
 function App() {
   return (
