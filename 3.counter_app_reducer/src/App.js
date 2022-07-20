@@ -35,28 +35,32 @@ const useGlobalState = () => {
   return value;
 };
 
-const GlobalStateProvider = ({children}) => (
+const GlobalStateProvider = ({ children }) => (
   <Context.Provider value={useValue()}>{children}</Context.Provider>
-)
+);
+
+const Counter = ({ name }) => {
+  const [state, dispatch] = useGlobalState();
+  return (
+    <div>
+      {state[name]}
+      <button onClick={() => dispatch({ type: "INCREMENT" }, name)}>+1</button>
+      <button onClick={() => dispatch({ type: "DECREMENT" }, name)}>-1</button>
+    </div>
+  );
+};
 
 function App() {
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    <GlobalStateProvider>
+      <h1>Count1</h1>
+      <Counter name="count1" />
+      <Counter name="count1" />
+
+      <h1>Count2</h1>
+      <Counter name="count2" />
+      <Counter name="count2" />
+    </GlobalStateProvider>
   );
 }
 
