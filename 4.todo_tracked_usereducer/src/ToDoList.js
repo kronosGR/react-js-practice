@@ -14,7 +14,7 @@ const ToDoList = () => {
         {state.todos.map(({ id, title, completed }) => (
           <TodoItem key={id} id={id} title={title} completed={completed} />
         ))}
-        {/*<NewTodo />*/}
+        {/*<NewTodo.js />*/}
       </ul>
       <div>
         Highlight Query for incomplete items:
