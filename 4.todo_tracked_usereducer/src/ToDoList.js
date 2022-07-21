@@ -1,5 +1,6 @@
 import { useDispatch, useTrackedState } from "./store";
 import TodoItem from "./TodoItem";
+import NewTodo from "./NewTodo";
 
 const ToDoList = () => {
   const dispatch = useDispatch();
@@ -14,7 +15,7 @@ const ToDoList = () => {
         {state.todos.map(({ id, title, completed }) => (
           <TodoItem key={id} id={id} title={title} completed={completed} />
         ))}
-        {/*<NewTodo.js />*/}
+        <NewTodo />
       </ul>
       <div>
         Highlight Query for incomplete items:
@@ -23,3 +24,5 @@ const ToDoList = () => {
     </div>
   );
 };
+
+export default ToDoList;
