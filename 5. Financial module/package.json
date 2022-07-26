@@ -15,5 +15,8 @@
     "babel-preset-stage-2": "^6.24.1",
     "webpack-cli": "^4.10.0",
     "wepback": "^1.0.0"
+  },
+  "dependencies": {
+    "underscore": "^1.13.4"
   }
 }
