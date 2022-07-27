@@ -1,7 +1,6 @@
-import logo from "./logo.svg";
 import "./App.css";
 
-const list = [
+const stories = [
   {
     title: "React",
     url: "https://reactjs.org/",
@@ -20,26 +19,25 @@ const list = [
   },
 ];
 
-const welcome = {
-  greeting: "Hey",
-  title: "React",
-};
 function App() {
+  const handlerChange = (event) => {
+    console.log(event);
+  };
   return (
     <div>
       <h1>My Hacker Stories</h1>
 
       <label htmlFor="search">Search: </label>
-      <input id="search" type="text" />
+      <input id="search" type="text" onChange={handlerChange} />
       <hr />
 
-      <List/>
+      <List list={stories} />
     </div>
   );
 }
 
-function List() {
-  return list.map(function(item) {
+const List = (props) => {
+  return props.list.map(function (item) {
     return (
       <div key={item.objectID}>
         <span>
@@ -51,5 +49,5 @@ function List() {
       </div>
     );
   });
-
+};
 export default App;
