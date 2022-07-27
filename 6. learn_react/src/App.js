@@ -20,10 +20,15 @@ function App() {
       objectID: 1,
     },
   ];
+  const [searchItem, setSearchItem] = useState("");
 
   const handleSearch = (event) => {
-    console.log(event.target.value);
+    setSearchItem(event.target.value);
   };
+
+  const searchedStories = stories.filter((story) =>
+    story.title.toLowerCase().includes(searchItem.toLowerCase())
+  );
 
   return (
     <div>
@@ -32,25 +37,16 @@ function App() {
       <Search onSearch={handleSearch} />
       <hr />
 
-      <List list={stories} />
+      <List list={searchedStories} />
     </div>
   );
 }
 
 const Search = (props) => {
-  const [searchItem, setSearchItem] = useState("");
-  const handlerChange = (event) => {
-    setSearchItem(event.target.value);
-    props.onSearch(event);
-  };
-
   return (
     <div>
       <label htmlFor="search">Search: </label>
-      <input id="search" type="text" onChange={handlerChange} />
-      <p>
-        Searching for <strong>{searchItem}</strong>
-      </p>
+      <input id="search" type="text" onChange={props.onSearch} />
     </div>
   );
 };
