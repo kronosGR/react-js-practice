@@ -34,7 +34,7 @@ function App() {
     <div>
       <h1>My Hacker Stories</h1>
 
-      <Search onSearch={handleSearch} />
+      <Search onSearch={handleSearch} search={searchItem} />
       <hr />
 
       <List list={searchedStories} />
@@ -42,17 +42,17 @@ function App() {
   );
 }
 
-const Search = (props) => {
+const Search = ({ search, onSearch }) => {
   return (
     <div>
       <label htmlFor="search">Search: </label>
-      <input id="search" type="text" onChange={props.onSearch} />
+      <input id="search" type="text" value={search} onChange={onSearch} />
     </div>
   );
 };
 
-const List = (props) => {
-  return props.list.map(function (item) {
+const List = ({ list }) => {
+  return list.map(function (item) {
     return (
       <div key={item.objectID}>
         <span>
