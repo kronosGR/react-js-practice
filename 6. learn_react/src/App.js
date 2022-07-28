@@ -1,6 +1,16 @@
 import "./App.css";
 import { useEffect, useState } from "react";
 
+const useSemiPersistentState = (key, initialState) => {
+  const [value, setValue] = useState(localStorage.getItem(key) || initialState);
+
+  useEffect(() => {
+    localStorage.setItem(key, value);
+  }, [value, key]);
+
+  return [value, setValue];
+};
+
 function App() {
   const stories = [
     {
@@ -20,27 +30,21 @@ function App() {
       objectID: 1,
     },
   ];
-  const [searchItem, setSearchItem] = useState(
-    localStorage.getItem("search") || "React"
-  );
-
-  useEffect(() => {
-    localStorage.setItem("search", searchItem);
-  }, [searchItem]);
+  const [searchTerm, setSearchTerm] = useSemiPersistentState("search", "React");
 
   const handleSearch = (event) => {
-    setSearchItem(event.target.value);
+    setSearchTerm(event.target.value);
   };
 
   const searchedStories = stories.filter((story) =>
-    story.title.toLowerCase().includes(searchItem.toLowerCase())
+    story.title.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
   return (
     <div>
       <h1>My Hacker Stories</h1>
 
-      <Search onSearch={handleSearch} search={searchItem} />
+      <Search onSearch={handleSearch} search={searchTerm} />
       <hr />
 
       <List list={searchedStories} />
