@@ -1,5 +1,5 @@
 import "./App.css";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 function App() {
   const stories = [
@@ -20,7 +20,13 @@ function App() {
       objectID: 1,
     },
   ];
-  const [searchItem, setSearchItem] = useState("");
+  const [searchItem, setSearchItem] = useState(
+    localStorage.getItem("search") || "React"
+  );
+
+  useEffect(() => {
+    localStorage.setItem("search", searchItem);
+  }, [searchItem]);
 
   const handleSearch = (event) => {
     setSearchItem(event.target.value);
