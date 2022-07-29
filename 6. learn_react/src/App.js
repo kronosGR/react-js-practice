@@ -1,5 +1,5 @@
 import "./App.css";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useReducer, useRef, useState } from "react";
 
 const useSemiPersistentState = (key, initialState) => {
   const [value, setValue] = useState(localStorage.getItem(key) || initialState);
@@ -37,26 +37,41 @@ function App() {
     );
 
   const [searchTerm, setSearchTerm] = useSemiPersistentState("search", "React");
-  const [stories, setStories] = useState([]);
+  // const [stories, setStories] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   const [isError, setIsError] = useState(false);
+
+  const storiesReducer = (state, action) => {
+    switch (action.type) {
+      case "SET_STORIES":
+        return action.payload;
+      case "REMOVE_ITEM":
+        return state.filter(
+          (story) => action.payload.objectID !== story.objectID
+        );
+      default:
+        throw new Error();
+    }
+  };
+
+  const [stories, dispatchStories] = useReducer(storiesReducer, []);
 
   useEffect(() => {
     setIsLoading(true);
 
     getAsyncStories()
       .then((result) => {
-        setStories(result.data.stories);
+        dispatchStories({ type: "SET_STORIES", payload: result.data.stories });
         setIsLoading(false);
       })
       .catch(() => setIsError(true));
   }, []);
 
   const handleRemoveStory = (item) => {
-    const newStories = stories.filter(
-      (story) => story.objectID !== story.objectID
-    );
-    setStories(newStories);
+    // const newStories = stories.filter(
+    //   (story) => story.objectID !== story.objectID
+    // );
+    dispatchStories({ type: "REMOVE_ITEM", payload: item });
   };
 
   const handleSearch = (event) => {
