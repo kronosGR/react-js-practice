@@ -56,7 +56,7 @@ function App() {
         id="search"
         value={searchTerm}
         isFocused
-        onInputChange={handleSearch()}
+        onInputChange={handleSearch}
       >
         <strong>Search:</strong>
       </InputWithLabel>
