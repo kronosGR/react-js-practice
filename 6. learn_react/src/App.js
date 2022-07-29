@@ -38,33 +38,56 @@ function App() {
 
   const [searchTerm, setSearchTerm] = useSemiPersistentState("search", "React");
   // const [stories, setStories] = useState([]);
-  const [isLoading, setIsLoading] = useState(false);
-  const [isError, setIsError] = useState(false);
+  // const [isLoading, setIsLoading] = useState(false);
+  // const [isError, setIsError] = useState(false);
 
   const storiesReducer = (state, action) => {
     switch (action.type) {
-      case "SET_STORIES":
-        return action.payload;
-      case "REMOVE_ITEM":
-        return state.filter(
-          (story) => action.payload.objectID !== story.objectID
-        );
+      case "STORIES_FETCH_INIT":
+        return {
+          ...state,
+          isLoading: true,
+          error: false,
+        };
+      case "STORIES_FETCH_SUCCESS":
+        return {
+          ...state,
+          isLoading: false,
+          isError: false,
+          data: action.payload,
+        };
+      case "STORIES_FETCH_FAILURE":
+        return {
+          ...state,
+          isLoading: false,
+          isError: true,
+        };
+      case "REMOVE_STORY":
+        return {
+          ...state,
+          data: state.data.filter(
+            (story) => action.payload.objectID !== story.objectID
+          ),
+        };
       default:
         throw new Error();
     }
   };
 
-  const [stories, dispatchStories] = useReducer(storiesReducer, []);
+  const [stories, dispatchStories] = useReducer(storiesReducer, {
+    data: [],
+    isLoading: false,
+    isError: false,
+  });
 
   useEffect(() => {
-    setIsLoading(true);
+    dispatchStories({ tyoe: "STORIES_FETCH_INIT" });
 
     getAsyncStories()
       .then((result) => {
         dispatchStories({ type: "SET_STORIES", payload: result.data.stories });
-        setIsLoading(false);
       })
-      .catch(() => setIsError(true));
+      .catch(() => dispatchStories({ type: "STORIES_FETCH_FAILURE" }));
   }, []);
 
   const handleRemoveStory = (item) => {
@@ -78,7 +101,7 @@ function App() {
     setSearchTerm(event.target.value);
   };
 
-  const searchedStories = stories.filter((story) =>
+  const searchedStories = stories.data.filter((story) =>
     story.title.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
@@ -96,9 +119,9 @@ function App() {
       </InputWithLabel>
       <hr />
 
-      {isError && <p>Something went wrong...</p>}
+      {stories.isError && <p>Something went wrong...</p>}
 
-      {isLoading ? (
+      {stories.isLoading ? (
         <p>Loading...</p>
       ) : (
         <List list={searchedStories} onRemoveItem={handleRemoveStory} />
