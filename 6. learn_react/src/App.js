@@ -1,8 +1,32 @@
-import React from "react";
-import axios from "axios";
-import { sortBy } from "lodash";
+import React from 'react';
+import axios from 'axios';
+import { sortBy } from 'lodash';
 
-const API_ENDPOINT = "https://hn.algolia.com/api/v1/search?query=";
+const API_ENDPOINT = 'https://hn.algolia.com/api/v1/search?query=';
+
+const getUrl = searchTerm => `${API_ENDPOINT}${searchTerm}`;
+
+const extractSearchTerm = url => url.replace(API_ENDPOINT, '');
+
+const getLastSearches = urls =>
+  urls
+    .reduce((result, url, index) => {
+      const searchTerm = extractSearchTerm(url);
+
+      if (index === 0) {
+        return result.concat(searchTerm);
+      }
+
+      const previousSearchTerm = result[result.length - 1];
+
+      if (searchTerm === previousSearchTerm) {
+        return result;
+      } else {
+        return result.concat(searchTerm);
+      }
+    }, [])
+    .slice(-6)
+    .slice(0, -1);
 
 const useSemiPersistentState = (key, initialState) => {
   const [value, setValue] = React.useState(
@@ -18,30 +42,30 @@ const useSemiPersistentState = (key, initialState) => {
 
 const storiesReducer = (state, action) => {
   switch (action.type) {
-    case "STORIES_FETCH_INIT":
+    case 'STORIES_FETCH_INIT':
       return {
         ...state,
         isLoading: true,
         isError: false,
       };
-    case "STORIES_FETCH_SUCCESS":
+    case 'STORIES_FETCH_SUCCESS':
       return {
         ...state,
         isLoading: false,
         isError: false,
         data: action.payload,
       };
-    case "STORIES_FETCH_FAILURE":
+    case 'STORIES_FETCH_FAILURE':
       return {
         ...state,
         isLoading: false,
         isError: true,
       };
-    case "REMOVE_STORY":
+    case 'REMOVE_STORY':
       return {
         ...state,
         data: state.data.filter(
-          (story) => action.payload.objectID !== story.objectID
+          story => action.payload.objectID !== story.objectID
         ),
       };
     default:
@@ -49,48 +73,32 @@ const storiesReducer = (state, action) => {
   }
 };
 
-const extractSearchTerm = (url) => url.replace(API_ENDPOINT, "");
-const getLastSearches = (urls) => urls.slice(-5).map(extractSearchTerm);
-const getUrl = (searchTerm) => `${API_ENDPOINT}${searchTerm}`;
-
 const App = () => {
-  const [searchTerm, setSearchTerm] = useSemiPersistentState("search", "React");
-
-  const handleSearchSubmit = (event) => {
-    handleSearch(searchTerm);
-    event.preventDefault();
-  };
-
-  const handleLastSearch = (searchTerm) => {
-    handleSearch(searchTerm);
-  };
-  const handleSearch = (searchTerm) => {
-    const url = getUrl(searchTerm);
-    setUrls(urls.concat(url));
-  };
+  const [searchTerm, setSearchTerm] = useSemiPersistentState(
+    'search',
+    'React'
+  );
 
   const [urls, setUrls] = React.useState([getUrl(searchTerm)]);
-  const lastSearches = getLastSearches(urls);
 
-  const [stories, dispatchStories] = React.useReducer(storiesReducer, {
-    data: [],
-    isLoading: false,
-    isError: false,
-  });
+  const [stories, dispatchStories] = React.useReducer(
+    storiesReducer,
+    { data: [], isLoading: false, isError: false }
+  );
 
   const handleFetchStories = React.useCallback(async () => {
-    dispatchStories({ type: "STORIES_FETCH_INIT" });
+    dispatchStories({ type: 'STORIES_FETCH_INIT' });
 
     try {
       const lastUrl = urls[urls.length - 1];
       const result = await axios.get(lastUrl);
 
       dispatchStories({
-        type: "STORIES_FETCH_SUCCESS",
+        type: 'STORIES_FETCH_SUCCESS',
         payload: result.data.hits,
       });
     } catch {
-      dispatchStories({ type: "STORIES_FETCH_FAILURE" });
+      dispatchStories({ type: 'STORIES_FETCH_FAILURE' });
     }
   }, [urls]);
 
@@ -98,16 +106,35 @@ const App = () => {
     handleFetchStories();
   }, [handleFetchStories]);
 
-  const handleRemoveStory = (item) => {
+  const handleRemoveStory = item => {
     dispatchStories({
-      type: "REMOVE_STORY",
+      type: 'REMOVE_STORY',
       payload: item,
     });
   };
 
-  const handleSearchInput = (event) => {
+  const handleSearchInput = event => {
     setSearchTerm(event.target.value);
   };
+
+  const handleSearchSubmit = event => {
+    handleSearch(searchTerm);
+
+    event.preventDefault();
+  };
+
+  const handleLastSearch = searchTerm => {
+    setSearchTerm(searchTerm);
+
+    handleSearch(searchTerm);
+  };
+
+  const handleSearch = searchTerm => {
+    const url = getUrl(searchTerm);
+    setUrls(urls.concat(url));
+  };
+
+  const lastSearches = getLastSearches(urls);
 
   return (
     <div>
@@ -118,15 +145,11 @@ const App = () => {
         onSearchInput={handleSearchInput}
         onSearchSubmit={handleSearchSubmit}
       />
-      {lastSearches.map((searchTerm, index) => (
-        <button
-          key={searchTerm + index}
-          type="button"
-          onClick={() => handleLastSearch(searchTerm)}
-        >
-          {searchTerm}
-        </button>
-      ))}
+
+      <LastSearches
+        lastSearches={lastSearches}
+        onLastSearch={handleLastSearch}
+      />
 
       <hr />
 
@@ -141,7 +164,25 @@ const App = () => {
   );
 };
 
-const SearchForm = ({ searchTerm, onSearchInput, onSearchSubmit }) => (
+const LastSearches = ({ lastSearches, onLastSearch }) => (
+  <>
+    {lastSearches.map((searchTerm, index) => (
+      <button
+        key={searchTerm + index}
+        type="button"
+        onClick={() => onLastSearch(searchTerm)}
+      >
+        {searchTerm}
+      </button>
+    ))}
+  </>
+);
+
+const SearchForm = ({
+                      searchTerm,
+                      onSearchInput,
+                      onSearchSubmit,
+                    }) => (
   <form onSubmit={onSearchSubmit}>
     <InputWithLabel
       id="search"
@@ -159,13 +200,13 @@ const SearchForm = ({ searchTerm, onSearchInput, onSearchSubmit }) => (
 );
 
 const InputWithLabel = ({
-  id,
-  value,
-  type = "text",
-  onInputChange,
-  isFocused,
-  children,
-}) => {
+                          id,
+                          value,
+                          type = 'text',
+                          onInputChange,
+                          isFocused,
+                          children,
+                        }) => {
   const inputRef = React.useRef();
 
   React.useEffect(() => {
@@ -190,20 +231,20 @@ const InputWithLabel = ({
 };
 
 const SORTS = {
-  NONE: (list) => list,
-  TITLE: (list) => sortBy(list, "title"),
-  AUTHOR: (list) => sortBy(list, "author"),
-  COMMENT: (list) => sortBy(list, "num_comments").reverse(),
-  POINT: (list) => sortBy(list, "points").reverse(),
+  NONE: list => list,
+  TITLE: list => sortBy(list, 'title'),
+  AUTHOR: list => sortBy(list, 'author'),
+  COMMENT: list => sortBy(list, 'num_comments').reverse(),
+  POINT: list => sortBy(list, 'points').reverse(),
 };
 
 const List = ({ list, onRemoveItem }) => {
   const [sort, setSort] = React.useState({
-    sortKey: "NONE",
+    sortKey: 'NONE',
     isReverse: false,
   });
 
-  const handleSort = (sortKey) => {
+  const handleSort = sortKey => {
     const isReverse = sort.sortKey === sortKey && !sort.isReverse;
 
     setSort({ sortKey, isReverse });
@@ -219,30 +260,34 @@ const List = ({ list, onRemoveItem }) => {
     <div>
       <div>
         <span>
-          <button type="button" onClick={() => handleSort("TITLE")}>
+          <button type="button" onClick={() => handleSort('TITLE')}>
             Title
           </button>
         </span>
         <span>
-          <button type="button" onClick={() => handleSort("AUTHOR")}>
+          <button type="button" onClick={() => handleSort('AUTHOR')}>
             Author
           </button>
         </span>
         <span>
-          <button type="button" onClick={() => handleSort("COMMENT")}>
+          <button type="button" onClick={() => handleSort('COMMENT')}>
             Comments
           </button>
         </span>
         <span>
-          <button type="button" onClick={() => handleSort("POINT")}>
+          <button type="button" onClick={() => handleSort('POINT')}>
             Points
           </button>
         </span>
         <span>Actions</span>
       </div>
 
-      {sortedList.map((item) => (
-        <Item key={item.objectID} item={item} onRemoveItem={onRemoveItem} />
+      {sortedList.map(item => (
+        <Item
+          key={item.objectID}
+          item={item}
+          onRemoveItem={onRemoveItem}
+        />
       ))}
     </div>
   );
