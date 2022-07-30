@@ -49,10 +49,28 @@ const storiesReducer = (state, action) => {
   }
 };
 
+const extractSearchTerm = (url) => url.replace(API_ENDPOINT, "");
+const getLastSearches = (urls) => urls.slice(-5).map(extractSearchTerm);
+const getUrl = (searchTerm) => `${API_ENDPOINT}${searchTerm}`;
+
 const App = () => {
   const [searchTerm, setSearchTerm] = useSemiPersistentState("search", "React");
 
-  const [url, setUrl] = React.useState(`${API_ENDPOINT}${searchTerm}`);
+  const handleSearchSubmit = (event) => {
+    handleSearch(searchTerm);
+    event.preventDefault();
+  };
+
+  const handleLastSearch = (searchTerm) => {
+    handleSearch(searchTerm);
+  };
+  const handleSearch = (searchTerm) => {
+    const url = getUrl(searchTerm);
+    setUrls(urls.concat(url));
+  };
+
+  const [urls, setUrls] = React.useState([getUrl(searchTerm)]);
+  const lastSearches = getLastSearches(urls);
 
   const [stories, dispatchStories] = React.useReducer(storiesReducer, {
     data: [],
@@ -64,7 +82,8 @@ const App = () => {
     dispatchStories({ type: "STORIES_FETCH_INIT" });
 
     try {
-      const result = await axios.get(url);
+      const lastUrl = urls[urls.length - 1];
+      const result = await axios.get(lastUrl);
 
       dispatchStories({
         type: "STORIES_FETCH_SUCCESS",
@@ -73,7 +92,7 @@ const App = () => {
     } catch {
       dispatchStories({ type: "STORIES_FETCH_FAILURE" });
     }
-  }, [url]);
+  }, [urls]);
 
   React.useEffect(() => {
     handleFetchStories();
@@ -90,12 +109,6 @@ const App = () => {
     setSearchTerm(event.target.value);
   };
 
-  const handleSearchSubmit = (event) => {
-    setUrl(`${API_ENDPOINT}${searchTerm}`);
-
-    event.preventDefault();
-  };
-
   return (
     <div>
       <h1>My Hacker Stories</h1>
@@ -105,6 +118,15 @@ const App = () => {
         onSearchInput={handleSearchInput}
         onSearchSubmit={handleSearchSubmit}
       />
+      {lastSearches.map((searchTerm, index) => (
+        <button
+          key={searchTerm + index}
+          type="button"
+          onClick={() => handleLastSearch(searchTerm)}
+        >
+          {searchTerm}
+        </button>
+      ))}
 
       <hr />
 
