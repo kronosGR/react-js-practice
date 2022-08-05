@@ -1,5 +1,5 @@
 import { store } from "./store";
-import { setTechnology } from "./actions";
+import { setsetTechnologyTechnology } from "./actions";
 
 function dispatchBtnAction(e) {
   const tech = e.target.dataset.tech;
