@@ -3,15 +3,12 @@ import "./App.css";
 import { createStore } from "redux";
 import reducer from "./reducers";
 import Hello from "./Hello";
-
-const initialState = { tech: "React" };
-
-const store = createStore(reducer, initialState);
+import { store } from "./store";
 
 function App() {
   return (
     <div>
-      <Hello tect={store.getState()} />
+      <Hello tect={store.getState().tech} />
     </div>
   );
 }
